@@ -1,0 +1,85 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: testing for 123
+      id: testing-for-123
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: testing for 123
+        setup-command: ''
+        command: python3 recursive_sum/main.py
+        input: '123'
+        expected-output: '6'
+        comparison-method: contains
+        timeout: 10
+        max-score: 2
+    - name: testing for 0
+      id: testing-for-0
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: testing for 0
+        setup-command: ''
+        command: python3 recursive_sum/main.py
+        input: '0'
+        expected-output: '0'
+        comparison-method: contains
+        timeout: 10
+        max-score: 1
+    - name: testing for 9999
+      id: testing-for-9999
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: testing for 9999
+        setup-command: ''
+        command: python3 recursive_sum/main.py
+        input: '9999'
+        expected-output: '36'
+        comparison-method: contains
+        timeout: 10
+        max-score: 1
+    - name: testing for -10
+      id: testing-for-10
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: testing for -10
+        setup-command: ''
+        command: python3 recursive_sum/main.py
+        input: "-10"
+        expected-output: Error
+        comparison-method: contains
+        timeout: 10
+        max-score: 1
+    - name: testing for xyz
+      id: testing-for-xyz
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: testing for xyz
+        setup-command: ''
+        command: python3 recursive_sum/main.py
+        input: xyz
+        expected-output: Error
+        comparison-method: contains
+        timeout: 10
+        max-score: 1
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TESTING-FOR-123_RESULTS: "${{steps.testing-for-123.outputs.result}}"
+        TESTING-FOR-0_RESULTS: "${{steps.testing-for-0.outputs.result}}"
+        TESTING-FOR-9999_RESULTS: "${{steps.testing-for-9999.outputs.result}}"
+        TESTING-FOR-10_RESULTS: "${{steps.testing-for-10.outputs.result}}"
+        TESTING-FOR-XYZ_RESULTS: "${{steps.testing-for-xyz.outputs.result}}"
+      with:
+        runners: testing-for-123,testing-for-0,testing-for-9999,testing-for-10,testing-for-xyz
